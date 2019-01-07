@@ -1,7 +1,7 @@
 {
   "name":"ESP32FTPServer",
-  "description":"Simple FTP Server for Espressiv ESP32",
-  "keywords":"ftp server, ftserver",
+  "description":"Simple FTP Server on SD Card for Espressiv ESP32",
+  "keywords":"ftp server, ftserver, sd card",
   "authors":
   {
     "name": "HenrikSte",
