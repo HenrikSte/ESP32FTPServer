@@ -1,0 +1,19 @@
+{
+  "name":"ESP32FTPServer",
+  "description":"Simple FTP Server for Espressiv ESP32",
+  "keywords":"ftp server, ftserver",
+  "authors":
+  {
+    "name": "HenrikSte",
+    "maintainer": true
+  },
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/HenrikSte/ESP32FTPServer.git"
+  },
+  "version": "0.0.1",
+  "license": "LGPL-3.0",
+  "frameworks": "arduino",
+  "platforms": ["espressif32"]  
+}
