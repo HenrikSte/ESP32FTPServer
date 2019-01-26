@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 //  2017: modified by @robo8080
+//  2019: modified by @HenrikSte
 
 #include "ESP32FtpServer.h"
 
@@ -38,28 +39,6 @@ WiFiServer dataServer( FTP_DATA_PORT_PASV );
 FtpServer::FtpServer()
 {
 
-}
-
-bool createDir(fs::FS &fs, const char * path){
-    Serial.printf("Creating Dir: %s\n", path);
-    if(fs.mkdir(path)){
-        Serial.println("Dir created");
-        return true;
-    } else {
-        Serial.println("mkdir failed");
-        return false;
-    }
-}
-
-bool removeDir(fs::FS &fs, const char * path){
-    Serial.printf("Removing Dir: %s\n", path);
-    if(fs.rmdir(path)){
-        Serial.println("Dir removed");
-        return true;
-    } else {
-        Serial.println("rmdir failed");
-        return false;
-    }
 }
 
 void FtpServer::begin(String uname, String pword)
@@ -117,10 +96,10 @@ void FtpServer::iniVariables()
   
 }
 
-void FtpServer::handleFTP()
+int FtpServer::handleFTP()
 {
   if((int32_t) ( millisDelay - millis() ) > 0 )
-    return;
+    return 0;
 
   if (ftpServer.hasClient()) {
 //  if (ftpServer.available()) {
@@ -200,6 +179,10 @@ void FtpServer::handleFTP()
     millisDelay = millis() + 200;    // delay of 200 ms
     cmdStatus = 0;
   }
+
+
+  return    transferStatus!=0
+         || cmdStatus     !=0;
 }
 
 void FtpServer::clientConnected()
@@ -672,7 +655,9 @@ boolean FtpServer::processCommand()
     Serial.print("try to create  ");
     Serial.println(dir);
     #endif
-    if (createDir(SD, dir.c_str()))
+
+    fs::FS &fs = SD;
+    if (fs.mkdir(dir.c_str()))
     {
       client.println( "257 \"" + String(parameters) + "\" - Directory successfully created");  
     }
@@ -702,8 +687,8 @@ boolean FtpServer::processCommand()
     {
       dir = String(cwdName) +"/" + parameters;
     }
-
-    if (removeDir(SD, dir.c_str()))
+    fs::FS &fs = SD;
+    if (fs.rmdir(dir.c_str()))
     {
       client.println( "250 RMD command successful");  
     }
@@ -872,21 +857,23 @@ boolean FtpServer::doStore()
   if( data.connected() )
   {
     unsigned long ms0 = millis();
-    Serial.print("Transfer=");
+    //Serial.print("Transfer=");
     int16_t nb = data.readBytes((uint8_t*) buf, FTP_BUF_SIZE );
-    unsigned long ms1 = millis();
-    Serial.print(ms1-ms0);
+    //unsigned long ms1 = millis();
+    //Serial.print(ms1-ms0);
     if( nb > 0 )
     {
       // Serial.println( millis() << " " << nb << endl;
-      Serial.print("SD=");
+      //Serial.print("SD=");
       size_t written = file.write((uint8_t*) buf, nb );
+      /*
       unsigned long ms2 = millis();
       Serial.print(ms2-ms1);
       Serial.print("nb=");
       Serial.print(nb);
       Serial.print("w=");
       Serial.println(written);
+      */
       bytesTransfered += nb;
     }
     else
